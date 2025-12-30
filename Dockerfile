@@ -34,18 +34,22 @@ RUN addgroup -g 1000 user && adduser -D -u 1000 -G user user
 # Copy compiled binary from builder
 COPY --from=builder /app/filebrowser /bin/filebrowser
 
-# Create writable directories for config, database, and data
+# Create writable directories
 RUN mkdir -p /home/user/config /home/user/database /home/user/srv && \
     chown -R user:user /home/user
 
-# Switch to non-root user
 USER user
 WORKDIR /home/user
 
-EXPOSE 80
+EXPOSE 8080
 
-# Run FileBrowser with writable database path
-ENTRYPOINT ["/sbin/tini", "--", "/bin/filebrowser", "--database", "/home/user/database/filebrowser.db", "--root", "/home/user/srv"]
+# Run FileBrowser bound to 0.0.0.0 (so Render can detect it)
+ENTRYPOINT ["/sbin/tini", "--", "/bin/filebrowser", \
+    "--database", "/home/user/database/filebrowser.db", \
+    "--root", "/home/user/srv", \
+    "--address", "0.0.0.0", \
+    "--port", "8080"]
+
 
 
 
