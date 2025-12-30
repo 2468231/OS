@@ -18,7 +18,34 @@ RUN addgroup -g $GID user && \
     adduser -D -u $UID -G user user
 
 # Copy binary, scripts, and configurations into image with proper ownership
-COPY --chown=user:user filebrowser /bin/filebrowser
+# ---------- First stage: build the FileBrowser binary ----------
+FROM golang:1.22-alpine AS builder
+WORKDIR /app
+
+# Install dependencies and copy all source code
+RUN apk add --no-cache git
+COPY . .
+RUN go mod download
+RUN go build -o filebrowser .
+
+# ---------- Second stage: lightweight runtime ----------
+FROM alpine:3.18
+
+# Create non-root user
+RUN addgroup -g 1000 user && adduser -D -u 1000 -G user user
+
+# Copy the built binary from the first stage
+COPY --from=builder /app/filebrowser /bin/filebrowser
+
+# Optional: copy configuration and helper scripts if present
+# (comment these out if these folders don't exist in your fork)
+# COPY --chown=user:user docker/common/ /
+# COPY --chown=user:user docker/alpine/ /
+
+USER user
+EXPOSE 80
+ENTRYPOINT ["/bin/filebrowser"]
+
 COPY --chown=user:user docker/common/ /
 COPY --chown=user:user docker/alpine/ /
 COPY --chown=user:user --from=fetcher /sbin/tini-static /bin/tini
@@ -44,3 +71,5 @@ VOLUME /srv /config /database
 EXPOSE 80
 
 ENTRYPOINT [ "tini", "--", "/init.sh" ]
+Fix Dockerfile: Added multi-stage build to compile filebrowser binary
+
