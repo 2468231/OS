@@ -34,14 +34,19 @@ RUN addgroup -g 1000 user && adduser -D -u 1000 -G user user
 # Copy compiled binary from builder
 COPY --from=builder /app/filebrowser /bin/filebrowser
 
-# Create required directories
-RUN mkdir -p /config /database /srv && \
-    chown -R user:user /config /database /srv
+# Create writable directories for config, database, and data
+RUN mkdir -p /home/user/config /home/user/database /home/user/srv && \
+    chown -R user:user /home/user
 
+# Switch to non-root user
 USER user
+WORKDIR /home/user
+
 EXPOSE 80
 
-ENTRYPOINT ["/sbin/tini", "--", "/bin/filebrowser"]
+# Run FileBrowser with writable database path
+ENTRYPOINT ["/sbin/tini", "--", "/bin/filebrowser", "--database", "/home/user/database/filebrowser.db", "--root", "/home/user/srv"]
+
 
 
 
