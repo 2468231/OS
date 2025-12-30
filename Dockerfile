@@ -25,7 +25,7 @@ FROM alpine:3.18
 # Install minimal runtime dependencies
 RUN apk add --no-cache ca-certificates tini mailcap
 
-# Create non-root user
+# Create a non-root user
 RUN addgroup -g 1000 user && adduser -D -u 1000 -G user user
 
 # Copy compiled binary from builder
@@ -39,6 +39,7 @@ USER user
 EXPOSE 80
 
 ENTRYPOINT ["/sbin/tini", "--", "/bin/filebrowser"]
+
 
 
 
