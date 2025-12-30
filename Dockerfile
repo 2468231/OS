@@ -45,11 +45,13 @@ WORKDIR /home/user
 EXPOSE 10000
 
 # Run FileBrowser bound to 0.0.0.0 (so Render detects it)
-ENTRYPOINT ["/sbin/tini", "--", "/bin/filebrowser", \
-    "--database", "/home/user/database/filebrowser.db", \
-    "--root", "/home/user/srv", \
-    "--address", "0.0.0.0", \
-    "--port", "10000"]
+ENTRYPOINT ["/sbin/tini", "--", "/bin/filebrowser",
+    "--database", "/home/user/database/filebrowser.db",
+    "--root", "/home/user/srv",
+    "--address", "0.0.0.0",
+    "--port", "10000",
+    "--username", "admin",
+    "--password", "admin123"]
 
 
 
