@@ -2,8 +2,11 @@
 FROM golang:1.25-alpine AS builder
 WORKDIR /app
 
-# Install required build tools
+# Install build tools
 RUN apk add --no-cache git nodejs npm
+
+# Install pnpm (used by FileBrowser frontend)
+RUN npm install -g pnpm
 
 # Copy source code
 COPY . .
@@ -13,7 +16,7 @@ RUN go mod download
 
 # ---------- Build frontend ----------
 WORKDIR /app/frontend
-RUN npm install && npm run build
+RUN pnpm install && pnpm run build
 
 # ---------- Build backend binary ----------
 WORKDIR /app
