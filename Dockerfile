@@ -71,5 +71,5 @@ VOLUME /srv /config /database
 EXPOSE 80
 
 ENTRYPOINT [ "tini", "--", "/init.sh" ]
-Fix Dockerfile: Added multi-stage build to compile filebrowser binary
+
 
